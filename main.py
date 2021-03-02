@@ -8,6 +8,7 @@ def get_result_trac_nghiem(image_trac_nghiem, ANSWER_KEY):
 	translate = {"A": 0, "B": 1, "C": 2, "D": 3}
 	revert_translate={0:"A",1:"B",2:"C",3:"D",-1:"N"}
 	image = image_trac_nghiem
+	height, width, channels = image.shape
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 	thresh = cv2.threshold(gray, 0, 255,
 		cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
@@ -19,7 +20,7 @@ def get_result_trac_nghiem(image_trac_nghiem, ANSWER_KEY):
 	for c in cnts:
 		(x, y, w, h) = cv2.boundingRect(c)
 		ar = w / float(h)
-		if w >= 20 and h >= 20 and ar >= 0.7 and ar <= 1.3:
+		if w >= width/25 and h >= height/70 and ar >= 0.7 and ar <= 1.3:
 			questionCnts.append(c)
 
 	questionCnts = contours.sort_contours(questionCnts,
@@ -178,8 +179,8 @@ def get_mdt(image_mdt):
 
 if __name__ == "__main__":
 	cur_dir = os.getcwd()
-	link = cur_dir + "/707cfe4bb38440da1995.jpg"
-	# link = cur_dir + "/input_trac_nghiem2.jpg"
+	# link = cur_dir + "/707cfe4bb38440da1995.jpg"
+	link = cur_dir + "/input_trac_nghiem2.jpg"
 	ANSWER_KEY = ["A", "B", "C", "D","A","C", "D", "B", "A","C","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A",
 				  "A", "B", "C", "D","A","C", "D", "B", "A","C","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A",
 				  "A", "B", "C", "D","A","C", "D", "B", "A","C","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A",
