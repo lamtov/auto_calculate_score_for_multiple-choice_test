@@ -26,22 +26,30 @@ def get_result_trac_nghiem(image_trac_nghiem, ANSWER_KEY):
 	questionCnts = contours.sort_contours(questionCnts,
 		method="top-to-bottom")[0]
 	select=[]
-	total=0
+
+
 	for (q, i) in enumerate(np.arange(0, len(questionCnts), 4)):
 		cnts = contours.sort_contours(questionCnts[i:i + 4])[0]
 		bubbled=None
 		min =100000000
+		total = 0
+		list_total=[]
 		for (j, c) in enumerate(cnts):
 			# print(j)
 			mask = np.zeros(thresh.shape, dtype="uint8")
 			cv2.drawContours(mask, [c], -1, 255, -1)
 			mask = cv2.bitwise_and(thresh, thresh, mask=mask)
 			total = cv2.countNonZero(mask)
+			if total >0:
+				list_total.append(total)
 			if total <= min:
 				min=total
 			if bubbled is None or total > bubbled[0]:
 				bubbled = (total, j)
 
+		for tt in list_total:
+			if tt != bubbled[0] and bubbled[0]/tt < 1.5:
+				bubbled = (total, -1)
 		if bubbled[0]<min*1.5:
 			bubbled=(total,-1)
 		color = (0, 0, 255)
@@ -183,7 +191,7 @@ if __name__ == "__main__":
 	# link = cur_dir + "/input_trac_nghiem2.jpg"
 	ANSWER_KEY = ["A", "B", "C", "D","A","C", "D", "B", "A","C","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A",
 				  "A", "B", "C", "D","A","C", "D", "B", "A","C","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A",
-				  "A", "B", "C", "D","A","C", "D", "B", "A","C","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A",
+				  "A", "B", "C", "D","A","C", "D", "B", "A","C","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","D",
 				  "A", "B", "C", "D","A","C", "D", "B", "A","C","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A"]
 
 
