@@ -71,7 +71,7 @@ def get_sbd(image_sbd):
 	for c in cnts:
 		(x, y, w, h) = cv2.boundingRect(c)
 		ar = w / float(h)
-		if w >=width/13 and h >= height/13 and ar >= 0.7 and ar <= 1.3 and w < width/2 and h<=height/2 :
+		if w >=width/13 and h >= height/13 and ar >= 0.7 and ar <= 1.3 and w < width/2 and h<=height/8 :
 			questionCnts.append(c)
 
 	questionCnts = contours.sort_contours(questionCnts,
