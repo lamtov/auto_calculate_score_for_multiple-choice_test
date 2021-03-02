@@ -178,8 +178,8 @@ def get_mdt(image_mdt):
 
 if __name__ == "__main__":
 	cur_dir = os.getcwd()
-	# link = cur_dir + "/707cfe4bb38440da1995.jpg"
-	link = cur_dir + "/input_trac_nghiem2.jpg"
+	link = cur_dir + "/707cfe4bb38440da1995.jpg"
+	# link = cur_dir + "/input_trac_nghiem2.jpg"
 	ANSWER_KEY = ["A", "B", "C", "D","A","C", "D", "B", "A","C","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A",
 				  "A", "B", "C", "D","A","C", "D", "B", "A","C","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A",
 				  "A", "B", "C", "D","A","C", "D", "B", "A","C","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A","A", "B", "C", "D","A",
