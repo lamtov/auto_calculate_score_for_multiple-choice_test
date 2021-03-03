@@ -27,40 +27,51 @@ def get_result_trac_nghiem(image_trac_nghiem, ANSWER_KEY):
 		method="top-to-bottom")[0]
 	select=[]
 
+	min_black = 1000000000
+	max_black = 0
+	for (q, i) in enumerate(np.arange(0, len(questionCnts), 4)):
+		cnts = contours.sort_contours(questionCnts[i:i + 4])[0]
+		for (j, c) in enumerate(cnts):
+			mask = np.zeros(thresh.shape, dtype="uint8")
+			cv2.drawContours(mask, [c], -1, 255, -1)
+			mask = cv2.bitwise_and(thresh, thresh, mask=mask)
+			total = cv2.countNonZero(mask)
+			# print('total ' + str(total))
+			if total >max_black:
+				max_black=total
+			if total <= min_black:
+				min_black=total
+			if max_black>min_black*1.7:
+				break
+		if max_black > min_black * 1.7:
+			break
+
 
 	for (q, i) in enumerate(np.arange(0, len(questionCnts), 4)):
 		cnts = contours.sort_contours(questionCnts[i:i + 4])[0]
-		bubbled=None
-		min =100000000
-		total = 0
 		list_total=[]
 		for (j, c) in enumerate(cnts):
-			# print(j)
 			mask = np.zeros(thresh.shape, dtype="uint8")
 			cv2.drawContours(mask, [c], -1, 255, -1)
 			mask = cv2.bitwise_and(thresh, thresh, mask=mask)
 			total = cv2.countNonZero(mask)
 			if total >0:
-				list_total.append(total)
-			if total <= min:
-				min=total
-			if bubbled is None or total > bubbled[0]:
-				bubbled = (total, j)
+				list_total.append((total,j))
 
+		answer_q = [char for char in ANSWER_KEY[q]]
+		list_answer = []
+		list_select=''
 		for tt in list_total:
-			if tt != bubbled[0] and bubbled[0]/tt < 1.5:
-				bubbled = (total, -1)
-		if bubbled[0]<min*1.5:
-			bubbled=(total,-1)
-		color = (0, 0, 255)
-		k = translate[ANSWER_KEY[q]]
-		if k == bubbled[1]:
-			color = (0, 255, 0)
-		select.append(revert_translate[bubbled[1]])
-		# print(select)
-		cv2.drawContours(image, [cnts[k]], -1, color, 3)
-		# color = list(np.random.random(size=3) * 256)
-		# cv2.drawContours(image, cnts, -1, color, 3)
+			if  tt[0] > min_black * 1.7:
+				list_answer.append(tt[1])
+				list_select=list_select+revert_translate[tt[1]]
+		for answer in answer_q:
+			color = (0, 0, 255)
+			k = translate[answer]
+			if k in list_answer:
+				color = (0, 255, 0)
+			cv2.drawContours(image, [cnts[k]], -1, color, 3)
+		select.append(list_select)
 	return select,image
 
 
@@ -108,7 +119,7 @@ def get_sbd(image_sbd):
 			if bubbled is None or total > bubbled[0]:
 				bubbled = (total, j)
 
-		if bubbled[0] < min * 1.5:
+		if bubbled[0] < min * 1.4:
 			bubbled = (total, -1)
 
 		sbd.append(bubbled[1])
@@ -170,7 +181,7 @@ def get_mdt(image_mdt):
 				min = total
 			if bubbled is None or total > bubbled[0]:
 				bubbled = (total, j)
-		if bubbled[0] < min * 1.5:
+		if bubbled[0] < min * 1.4:
 			bubbled = (total, -1)
 
 		mdt.append(bubbled[1])
@@ -265,7 +276,7 @@ if __name__ == "__main__":
 	#
 	string_sbd=''.join(map(str,sbd))
 	string_mdt=''.join(map(str,mdt))
-	string_answer_list=''.join(map(str,all_answer_key))
+	string_answer_list='_'.join(map(str,all_answer_key))
 	#
 	print(string_sbd,string_mdt,string_answer_list)
 
