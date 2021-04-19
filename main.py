@@ -55,36 +55,45 @@ def get_result_trac_nghiem(image_trac_nghiem, ANSWER_KEY):
 
 	select=[]
 
-	min_black = 1000000000
-	max_black = 0
+	list_min_black = []
+
 	thresh = cv2.threshold(gray, 0, 255,
 						   cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+	min_black = 1000000000
 	for (q, i) in enumerate(np.arange(0, len(questionCnts), 4)):
+
 		cnts = contours.sort_contours(questionCnts[i:i + 4])[0]
 		for (j, c) in enumerate(cnts):
 			mask = np.zeros(thresh.shape, dtype="uint8")
 			cv2.drawContours(mask, [c], -1, 255, -1)
 			mask = cv2.bitwise_and(thresh, thresh, mask=mask)
 			total = cv2.countNonZero(mask)
+
 			# print('total ' + str(total))
-			if total >max_black:
-				max_black=total
 			if total <= min_black:
 				min_black=total
-			if max_black>min_black*1.7:
-				break
-		if max_black > min_black * 1.7:
-			break
+		# print(i,min_black)
+		if (i+4)%20==0:
+			list_min_black.append(min_black)
+
+			min_black = 1000000000
+
+
 
 
 	for (q, i) in enumerate(np.arange(0, len(questionCnts), 4)):
+
+		min_black=list_min_black[int((i)/20)]
 		cnts = contours.sort_contours(questionCnts[i:i + 4])[0]
 		list_total=[]
+		total_max=-1
 		for (j, c) in enumerate(cnts):
 			mask = np.zeros(thresh.shape, dtype="uint8")
 			cv2.drawContours(mask, [c], -1, 255, -1)
 			mask = cv2.bitwise_and(thresh, thresh, mask=mask)
 			total = cv2.countNonZero(mask)
+			if total > total_max:
+				total_max=total
 			if total >0:
 				list_total.append((total,j))
 
@@ -92,7 +101,7 @@ def get_result_trac_nghiem(image_trac_nghiem, ANSWER_KEY):
 		list_answer = []
 		list_select=''
 		for tt in list_total:
-			if  tt[0] > min_black * 1.7:
+			if  tt[0] > min_black * 1.5 and  tt[0]>total_max*0.7:
 				list_answer.append(tt[1])
 				list_select=list_select+revert_translate[tt[1]]
 		for answer in answer_q:
@@ -287,6 +296,14 @@ if __name__ == "__main__":
 
 
 	img = cv2.imread(link)
+
+	# gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	# thresh =cv2.threshold(gray, 0, 255,
+	# 					   cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+	# output_image = link[:-5]+"_dentrang"+link[-5:]
+	# cv2.imwrite(output_image, thresh)
+	# cv2.waitKey(0)
+
 	img_height, img_width, img_channels = img.shape
 	max_weight=1807
 	max_heigh=2555
@@ -326,10 +343,10 @@ if __name__ == "__main__":
 	# cv2.waitKey(0)
 	mdt, image_mdt = get_mdt(crop_img_mdt)
 	# print(mdt)
-
+	#
 	crop_img_1_30 = img[crop_1_30[1]:crop_1_30[3], crop_1_30[0]:crop_1_30[2]]
-	# cv2.imshow("cropped", crop_img_1_30)
-	# cv2.waitKey(0)
+	# # cv2.imshow("cropped", crop_img_1_30)
+	# # cv2.waitKey(0)
 	ans_1_30, image_1_30 = get_result_trac_nghiem(crop_img_1_30,ANSWER_KEY[0:30])
 
 	#
@@ -338,19 +355,23 @@ if __name__ == "__main__":
 	# cv2.imshow("cropped", crop_img_31_60)
 	# cv2.waitKey(0)
 	ans_31_60, image_31_60 = get_result_trac_nghiem(crop_img_31_60, ANSWER_KEY[30:60])
-	#
-	#
+	# #
+	# #
 	crop_img_61_90 = img[crop_61_90[1]:crop_61_90[3], crop_61_90[0]:crop_61_90[2]]
 	ans_61_90, image_61_90 = get_result_trac_nghiem(crop_img_61_90, ANSWER_KEY[60:90])
-	# cv2.imshow("cropped", crop_img_61_90)
-	# cv2.waitKey(0)
-	#
+	# # cv2.imshow("cropped", crop_img_61_90)
+	# # cv2.waitKey(0)
+	# #
 	crop_img_91_120 = img[crop_91_120[1]:crop_91_120[3], crop_91_120[0]:crop_91_120[2]]
 	ans_91_120, image_91_120 = get_result_trac_nghiem(crop_img_91_120, ANSWER_KEY[90:120])
-	# cv2.imshow("cropped", crop_img_91_120)
-	# cv2.waitKey(0)
-	#
-	all_answer_key = ans_91_120
+	# # cv2.imshow("cropped", crop_img_91_120)
+	# # cv2.waitKey(0)
+	# #
+	all_answer_key = ans_1_30+ans_31_60+ans_61_90+ans_91_120
+	# print(ans_1_30)
+	# print(ans_31_60)
+	# print(ans_61_90)
+	# print(ans_91_120)
 	print(all_answer_key)
 	#
 	#
